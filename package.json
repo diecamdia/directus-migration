@@ -1,0 +1,21 @@
+{
+  "name": "directus-migration",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "export-schema.js",
+  "scripts": {
+    "help": "node help.js",
+    "migrate": "node migrate.js",
+    "migrate:local": "node migrate-local.js",
+    "migrate:local:dry": "DRY_RUN=true node migrate-local.js",
+    "test:compare": "node test-comparison.js",
+    "migrate:debug": "DEBUG=true node migrate.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@directus/sdk": "^20.3.0"
+  }
+}
