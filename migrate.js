@@ -130,6 +130,9 @@ function compareFields(devSnapshot, prodSnapshot) {
   const updatedFields = [];
   
   devFields.forEach(devField => {
+    // Saltar campo 'id' - se crea automáticamente con la collection
+    if (devField.field === 'id') return;
+    
     const key = `${devField.collection}.${devField.field}`;
     const prodField = prodFieldsMap.get(key);
     
@@ -168,15 +171,23 @@ function compareRelations(devSnapshot, prodSnapshot) {
   const devRelations = devSnapshot?.data?.relations || [];
   const prodRelations = prodSnapshot?.data?.relations || [];
   
+  // Campos del sistema que tienen relaciones automáticas con directus_users
+  // Estas relaciones causan errores de FK constraint al migrar
+  const systemRelationFields = ['user_created', 'user_updated'];
+  
   // Crear mapa de relaciones existentes: collection.field -> relation
   const prodRelationsMap = new Map();
   prodRelations.forEach(r => {
     prodRelationsMap.set(`${r.collection}.${r.field}`, r);
   });
   
-  const newRelations = devRelations.filter(r => 
-    !prodRelationsMap.has(`${r.collection}.${r.field}`)
-  );
+  const newRelations = devRelations.filter(r => {
+    // Saltar relaciones de campos del sistema hacia directus_users
+    if (systemRelationFields.includes(r.field) && r.related_collection === 'directus_users') {
+      return false;
+    }
+    return !prodRelationsMap.has(`${r.collection}.${r.field}`);
+  });
   
   console.log(`  📊 Relations en desarrollo: ${devRelations.length}`);
   console.log(`  📊 Relations en producción: ${prodRelations.length}`);
